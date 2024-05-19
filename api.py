@@ -49,6 +49,21 @@ class ArchiveReaderClient:
             logging.debug('received book token: %s' % js['value'])
             self.token = js['value']
 
+    def return_book(self, book_id):
+        logging.debug('attempting to return loan')
+
+        # borrowing is done in two phases: 'browse_book' and 'grant_access'
+        self.book_id = book_id
+        url = self.URL_FORMAT % 'services/loans/loan/'
+        res = self.session.post(url, {
+            'action': 'return_loan',
+            'identifier': book_id
+        })
+        js = res.json()
+        if 'success' not in js:
+            err = js['error'] if 'error' in js else 'unknown error'
+            logging.error('error with action return_loan: %s' % err)
+            raise AssertionError
 
     # Renews a loaned book, which must be borrowed before calling this method.
     # You should use the scheduler instead of calling this directly.
@@ -77,7 +92,7 @@ class ArchiveReaderClient:
     def schedule_renew_book(self):
         logging.debug('time is %d, time to renew book again' % time.time())
         self.renew_book()
-        self.timer.enter(120, 1, self.schedule_renew_book)
+        self.timer.enter(900, 1, self.schedule_renew_book)
 
 
     # Borrows a book and then automatically renews it every two minutes.
@@ -136,10 +151,13 @@ class ArchiveReaderClient:
             raise IndexError
 
         res = self.session.get(self.book_page_urls[i] + "&scale=%d" % scale, headers={
-            'referer': self.URL_FORMAT % ('details/' + self.book_id)
+            'referer': self.URL_FORMAT % (f"details/{self.book_id}")
         })
-        return res.content
-
+        if res.status_code == 200:
+            return res.content
+        else:
+            logging.error(f"could not download page {i + 1}")
+            return None
 
     # Logs a user in to their archive.org account.
     def login(self, email, password):
