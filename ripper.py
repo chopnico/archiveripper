@@ -62,7 +62,8 @@ def main():
         else:
             os.mkdir(dir)
 
-    start = args.page_start
+    start = args.page_start if args.parse > 0 else 0
+
     for i in range(3):
         restart = False
         print(f"Attempt {i + 1}")
