@@ -62,6 +62,7 @@ def main():
         else:
             os.mkdir(dir)
 
+    start = 0
     for i in range(3):
         restart = False
         print(f"Attempt {i + 1}")
@@ -75,7 +76,6 @@ def main():
 
         page_count = client.fetch_book_metadata()
 
-        start = 0
         end = page_count
 
         if not args.all_pages:
