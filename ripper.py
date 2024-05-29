@@ -62,8 +62,7 @@ def main():
         else:
             os.mkdir(dir)
 
-    start = args.page_start if args.parse > 0 else 0
-
+    start = 0
     for i in range(3):
         restart = False
         print(f"Attempt {i + 1}")
@@ -101,7 +100,7 @@ def main():
                     file.write(contents)
             else:
                 restart = True
-                args.page_start = i + 1
+                start = i + 1
                 args.quiet = True
                 break
 
