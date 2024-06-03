@@ -101,6 +101,7 @@ def main():
             else:
                 restart = True
                 start = i + 1
+                args.all_pages = False
                 args.quiet = True
                 break
 
