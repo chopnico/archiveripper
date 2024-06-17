@@ -78,7 +78,7 @@ def main():
 
         end = page_count
 
-        if not args.all_pages:
+        if not args.all_pages and not restart:
             if not args.page_start and not args.page_end:
                 print('The book is %d pages long. Which pages do you want?' % page_count)
                 desired_pages = input('Enter a range (eg. 1-15) or leave blank for all: ')
@@ -100,8 +100,7 @@ def main():
                     file.write(contents)
             else:
                 restart = True
-                start = i + 1
-                args.all_pages = False
+                start = i
                 args.quiet = True
                 break
 
